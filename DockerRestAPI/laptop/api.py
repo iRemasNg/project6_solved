@@ -1,25 +1,3 @@
-# from flask import Flask
-# from flask_restful import Resource, Api
-
-# app = Flask(__name__)
-# api = Api(app)
-
-
-# class Laptop(Resource):
-    
-#     def get(self):
-#         return {
-#             'Laptops': ['MacBook', 'Dell', 'Lenovo', 'Surface']
-#         }
-
-
-# api.add_resource(Laptop, '/')
-
-# if __name__ == '__main__':
-#     app.run(debug=True, host='0.0.0.0')
-
-
-# Laptop Service
 from flask import Flask
 import flask
 from flask import request
@@ -263,14 +241,14 @@ class AllCSV(Resource):
         items = [item for item in _items]
 
         # Create a CSV string
-        csv_data = "distance,begin_date,begin_time,km,mi,location,open,close\n"
+        csv_data = "brevets/distance,brevets/begin_date,brevets/begin_time,brevets/controls/0/km,brevets/controls/0/mi,brevets/controls/0/location,brevets/controls/0/open,brevets/controls/0/close\n"
 
         for item in items:
             distance = item.get('distance', 0)
             begin_date = item.get('begin_date', '')
             begin_time = item.get('begin_time', '')
 
-            for control in item.get('controls', []):
+            for i, control in enumerate(item.get('controls', [])[:top]):
                 km = control.get('km', 0)
                 mi = control.get('mi', 0)
                 location = control.get('location', '')
@@ -299,7 +277,7 @@ class OpenOnlyCSV(Resource):
         sorted_open_times = sorted(all_open_times)[:top] if top else all_open_times
 
         # Create a CSV string for OpenOnly
-        csv_data = "distance,begin_date,begin_time,km,mi,location,open\n" if top is None else "distance,begin_date,begin_time,km,mi,location,open\n"
+        csv_data = "brevets/distance,brevets/begin_date,brevets/begin_time,brevets/controls/0/km,brevets/controls/0/mi,brevets/controls/0/location,brevets/controls/0/open\n" if top is None else "brevets/distance,brevets/begin_date,brevets/begin_time,brevets/controls/0/km,brevets/controls/0/mi,brevets/controls/0/location,brevets/controls/0/open\n"
 
         for item in items:
             distance = item.get('distance', 0)
@@ -319,7 +297,6 @@ class OpenOnlyCSV(Resource):
                     else:
                         csv_data += f"{distance},{begin_date},{begin_time},{km},{mi},{location},{open_time}\n"
 
-        # Create a CSV response
         response = Response(csv_data, content_type='text/csv')
         if top:
             response.headers['Content-Disposition'] = f'attachment; filename=top_{top}_open_times_data.csv'
@@ -327,6 +304,7 @@ class OpenOnlyCSV(Resource):
             response.headers['Content-Disposition'] = 'attachment; filename=open_times_data.csv'
 
         return response
+    
 
 class CloseOnlyCSV(Resource):
     def get(self):
@@ -341,7 +319,7 @@ class CloseOnlyCSV(Resource):
         sorted_close_times = sorted(all_close_times)[:top] if top else all_close_times
 
         # Create a CSV string for CloseOnly
-        csv_data = "distance,begin_date,begin_time,km,mi,location,close\n" if top is None else "distance,begin_date,begin_time,km,mi,location,close\n"
+        csv_data = "brevets/distance,brevets/begin_date,brevets/begin_time,brevets/controls/0/km,brevets/controls/0/mi,brevets/controls/0/location,brevets/controls/0/close\n" if top is None else "brevets/distance,brevets/begin_date,brevets/begin_time,brevets/controls/0/km,brevets/controls/0/mi,brevets/controls/0/location,brevets/controls/0/close\n"
 
         for item in items:
             distance = item.get('distance', 0)
@@ -369,6 +347,7 @@ class CloseOnlyCSV(Resource):
 
         return response
     
+
 
 
 api.add_resource(allL, '/listAll')
